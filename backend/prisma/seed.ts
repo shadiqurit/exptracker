@@ -105,14 +105,16 @@ async function main() {
   }
 
   // 3. Super Admin User
-  const adminPasswordHash = await argon2.hash('AdminPassword123!');
+  const adminPasswordHash = await argon2.hash('Exp_tracker8080##');
   const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@expensetracker.local' },
-    update: {},
-    create: {
-      email: 'admin@expensetracker.local',
+    where: { email: 'sadiq@shadiqur.bd' },
+    update: {
       passwordHash: adminPasswordHash,
-      firstName: 'System',
+    },
+    create: {
+      email: 'sadiq@shadiqur.bd',
+      passwordHash: adminPasswordHash,
+      firstName: 'Sadiq',
       lastName: 'Administrator',
       defaultCurrency: 'BDT',
       timezone: 'Asia/Dhaka',
@@ -415,7 +417,7 @@ async function main() {
 
   console.log('✅ Seeding completed successfully!');
   console.log('Credentials:');
-  console.log('  Super Admin: admin@expensetracker.local / AdminPassword123!');
+  console.log('  Super Admin: sadiq@shadiqur.bd / Exp_tracker8080##');
   console.log('  User A:      usera@example.com / UserA123!@#');
   console.log('  User B:      userb@example.com / UserB123!@#');
 }

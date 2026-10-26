@@ -26,7 +26,7 @@ describe('Financial Scenarios & Multi-User Isolation Tests', () => {
     // 3. Log in Super Admin
     const resAdmin = await request(app)
       .post('/api/v1/auth/login')
-      .send({ email: 'admin@expensetracker.local', password: 'AdminPassword123!' });
+      .send({ email: 'sadiq@shadiqur.bd', password: 'Exp_tracker8080##' });
     expect(resAdmin.status).toBe(200);
     adminToken = resAdmin.body.data.accessToken;
   });

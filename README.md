@@ -66,7 +66,7 @@ A modern, secure, responsive, and production-ready **Daily Expense & Income Trac
 |---|---|---|---|
 | **User A** | `usera@example.com` | `UserA123!@#` | **Full Scenarios 1–5 pre-loaded:** Cash (৳8,000), Bank (৳72,000), Mobile Wallet (৳8,000). Total Net Wealth: **৳88,000**. |
 | **User B** | `userb@example.com` | `UserB123!@#` | Multi-User Data Isolation test user. Completely independent accounts and records. |
-| **Super Admin** | `admin@expensetracker.local` | `AdminPassword123!` | User management, account activation toggle, operational metrics. |
+| **Super Admin** | `sadiq@shadiqur.bd` | `Exp_tracker8080##` | User management, account activation toggle, operational metrics. |
 
 ---
 

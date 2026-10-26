@@ -64,7 +64,7 @@ if [ $HEALTHY -eq 1 ]; then
     echo "Default Credentials:"
     echo "  User A:      usera@example.com / UserA123!@#"
     echo "  User B:      userb@example.com / UserB123!@#"
-    echo "  Super Admin: admin@expensetracker.local / AdminPassword123!"
+    echo "  Super Admin: sadiq@shadiqur.bd / Exp_tracker8080##"
     echo "=================================================================="
 else
     echo "⚠️ Warning: Service is still initializing. Check logs with: docker compose logs -f"
