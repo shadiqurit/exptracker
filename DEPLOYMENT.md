@@ -142,6 +142,36 @@ sudo systemctl reload nginx
 
 ---
 
+## 🪟 Option 3: Windows Server / Local PM2 Deployment
+
+For Windows Server or local Windows machines, pre-configured batch files automate the entire deployment and process management:
+
+### 1. One-Click PM2 Deployment (`pm2_deploy.bat`)
+Simply double-click `pm2_deploy.bat` in the root folder (`D:\app\exptracker\pm2_deploy.bat`). It automatically:
+1. Verifies Node.js & installs PM2 globally if missing (`npm i -g pm2`).
+2. Stops any previous instance to release native Windows file locks.
+3. Generates Prisma Client (`npx prisma generate`).
+4. Builds the Backend TypeScript API (`npm run build`).
+5. Builds the Frontend Single Page Application (`npm run build`).
+6. Starts the backend under PM2 cluster/fork daemon via `ecosystem.config.cjs` on port `3006`.
+7. Saves the PM2 process list (`pm2 save`).
+
+### 2. PM2 Management Batch Files
+- **`pm2_start.bat`**: Launches or reloads the PM2 application.
+- **`pm2_stop.bat`**: Gracefully stops the PM2 backend process.
+- **`pm2_restart.bat`**: Restarts the API process with zero downtime.
+- **`pm2_logs.bat`**: Displays real-time streaming application logs.
+
+### 3. Run PM2 Automatically on Windows Startup (Optional)
+To run PM2 in the background as a permanent Windows Service that starts automatically on boot:
+```cmd
+npm install -g pm2-windows-service
+pm2-service-install
+```
+Follow the prompt instructions (enter `Y` for PM2 as service, press Enter for default `PM2_HOME`).
+
+---
+
 ## 🔒 Free HTTPS / SSL with Let's Encrypt (Certbot)
 
 To secure your domain with free automated SSL certificates:
