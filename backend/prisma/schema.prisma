@@ -1,0 +1,339 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum RoleName {
+  SUPER_ADMIN
+  USER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum AccountType {
+  CASH
+  BANK
+  MOBILE_BANKING
+  DEBIT_CARD
+  CREDIT_CARD
+  SAVINGS
+  DIGITAL_WALLET
+  OTHER
+}
+
+enum AccountStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum TransferStatus {
+  COMPLETED
+  REVERSED
+}
+
+enum LedgerEntryType {
+  OPENING_BALANCE
+  INCOME
+  EXPENSE
+  TRANSFER_IN
+  TRANSFER_OUT
+  TRANSFER_REVERSAL
+}
+
+enum LedgerDirection {
+  DEBIT
+  CREDIT
+}
+
+enum RecurringFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+model User {
+  id              String       @id @default(uuid())
+  email           String       @unique
+  passwordHash    String       @map("password_hash")
+  firstName       String       @map("first_name")
+  lastName        String       @map("last_name")
+  phone           String?
+  avatarUrl       String?      @map("avatar_url")
+  defaultCurrency String       @default("BDT") @map("default_currency")
+  timezone        String       @default("Asia/Dhaka")
+  status          UserStatus   @default(ACTIVE)
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  roles                  UserRole[]
+  refreshTokens          RefreshToken[]
+  accounts               Account[]
+  categories             Category[]
+  transactions           Transaction[]
+  transfers              Transfer[]
+  budgets                Budget[]
+  ledgerEntries          LedgerEntry[]
+  recurringTransactions  RecurringTransaction[]
+  auditLogs              AuditLog[]
+
+  @@map("users")
+}
+
+model Role {
+  id          String     @id @default(uuid())
+  name        RoleName   @unique
+  description String?
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  users UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  userId    String   @map("user_id")
+  roleId    String   @map("role_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  tokenHash  String   @unique @map("token_hash")
+  userAgent  String?  @map("user_agent")
+  ipAddress  String?  @map("ip_address")
+  isRevoked  Boolean  @default(false) @map("is_revoked")
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Account {
+  id             String        @id @default(uuid())
+  userId         String        @map("user_id")
+  name           String
+  type           AccountType
+  accountNumber  String?       @map("account_number")
+  bankName       String?       @map("bank_name")
+  currency       String        @default("BDT")
+  openingBalance Decimal       @default(0.00) @map("opening_balance") @db.Decimal(15, 2)
+  status         AccountStatus @default(ACTIVE)
+  description    String?       @db.Text
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  user                 User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions         Transaction[]
+  transfersOut         Transfer[]             @relation("SourceAccount")
+  transfersIn          Transfer[]             @relation("DestinationAccount")
+  ledgerEntries        LedgerEntry[]
+  recurringTransactions RecurringTransaction[]
+
+  @@index([userId, status])
+  @@map("accounts")
+}
+
+model Category {
+  id        String       @id @default(uuid())
+  userId    String?      @map("user_id") // Null for system defaults
+  name      String
+  type      CategoryType
+  icon      String?
+  color     String?
+  isSystem  Boolean      @default(false) @map("is_system")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  user                  User?                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subcategories         Subcategory[]
+  transactions          Transaction[]
+  budgets               Budget[]
+  recurringTransactions RecurringTransaction[]
+
+  @@unique([userId, name, type])
+  @@index([userId, type])
+  @@map("categories")
+}
+
+model Subcategory {
+  id         String   @id @default(uuid())
+  categoryId String   @map("category_id")
+  name       String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  category     Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([categoryId, name])
+  @@map("subcategories")
+}
+
+model Transaction {
+  id              String          @id @default(uuid())
+  userId          String          @map("user_id")
+  accountId       String          @map("account_id")
+  categoryId      String          @map("category_id")
+  subcategoryId   String?         @map("subcategory_id")
+  type            TransactionType
+  amount          Decimal         @db.Decimal(15, 2)
+  transactionDate DateTime        @map("transaction_date")
+  description     String?         @db.Text
+  merchant        String?
+  referenceNumber String?         @map("reference_number")
+  receiptUrl      String?         @map("receipt_url")
+  isRecurring     Boolean         @default(false) @map("is_recurring")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account       Account       @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  category      Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  subcategory   Subcategory?  @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
+  ledgerEntries LedgerEntry[]
+
+  @@index([userId, transactionDate])
+  @@index([accountId, transactionDate])
+  @@index([categoryId])
+  @@map("transactions")
+}
+
+model Transfer {
+  id                   String         @id @default(uuid())
+  userId               String         @map("user_id")
+  sourceAccountId      String         @map("source_account_id")
+  destinationAccountId String         @map("destination_account_id")
+  amount               Decimal        @db.Decimal(15, 2)
+  transferDate         DateTime       @map("transfer_date")
+  referenceNumber      String?        @map("reference_number")
+  description          String?        @db.Text
+  idempotencyKey       String?        @unique @map("idempotency_key")
+  status               TransferStatus @default(COMPLETED)
+  reversalReason       String?        @map("reversal_reason")
+  createdAt            DateTime       @default(now()) @map("created_at")
+  updatedAt            DateTime       @updatedAt @map("updated_at")
+
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceAccount      Account       @relation("SourceAccount", fields: [sourceAccountId], references: [id], onDelete: Restrict)
+  destinationAccount Account       @relation("DestinationAccount", fields: [destinationAccountId], references: [id], onDelete: Restrict)
+  ledgerEntries      LedgerEntry[]
+
+  @@index([userId, transferDate])
+  @@index([sourceAccountId])
+  @@index([destinationAccountId])
+  @@map("transfers")
+}
+
+model LedgerEntry {
+  id            String          @id @default(uuid())
+  accountId     String          @map("account_id")
+  userId        String          @map("user_id")
+  transactionId String?         @map("transaction_id")
+  transferId    String?         @map("transfer_id")
+  entryType     LedgerEntryType @map("entry_type")
+  direction     LedgerDirection
+  amount        Decimal         @db.Decimal(15, 2)
+  entryDate     DateTime        @map("entry_date")
+  description   String?
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  account     Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transaction Transaction? @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  transfer    Transfer?    @relation(fields: [transferId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, entryDate])
+  @@index([userId, entryDate])
+  @@map("ledger_entries")
+}
+
+model Budget {
+  id                 String   @id @default(uuid())
+  userId             String   @map("user_id")
+  categoryId         String?  @map("category_id") // Null indicates overall monthly budget
+  amount             Decimal  @db.Decimal(15, 2)
+  month              Int      // 1-12
+  year               Int
+  alertThreshold80   Boolean  @default(false) @map("alert_threshold_80")
+  alertThreshold100  Boolean  @default(false) @map("alert_threshold_100")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, categoryId, month, year])
+  @@index([userId, year, month])
+  @@map("budgets")
+}
+
+model RecurringTransaction {
+  id                String             @id @default(uuid())
+  userId            String             @map("user_id")
+  accountId         String             @map("account_id")
+  categoryId        String             @map("category_id")
+  type              TransactionType
+  amount            Decimal            @db.Decimal(15, 2)
+  frequency         RecurringFrequency
+  startDate         DateTime           @map("start_date")
+  nextExecutionDate DateTime           @map("next_execution_date")
+  lastExecutionDate DateTime?          @map("last_execution_date")
+  isActive          Boolean            @default(true) @map("is_active")
+  description       String?
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account  Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive])
+  @@map("recurring_transactions")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?  @map("user_id")
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  action     String
+  oldData    String?  @map("old_data") @db.LongText
+  newData    String?  @map("new_data") @db.LongText
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@map("audit_logs")
+}

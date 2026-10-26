@@ -1,0 +1,102 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Expense Tracker REST API",
+    "version": "1.0.0",
+    "description": "Production-ready REST API for Daily Expense & Income Management with multi-account, double-entry ledger, and strict data isolation."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3006/api/v1",
+      "description": "Local development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "User registration",
+        "tags": ["Auth"]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "User login",
+        "tags": ["Auth"]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "summary": "Refresh access token",
+        "tags": ["Auth"]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Logout user",
+        "tags": ["Auth"]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get authenticated user profile",
+        "tags": ["Auth"]
+      }
+    },
+    "/accounts": {
+      "get": {
+        "summary": "Get all accounts with live calculated balances",
+        "tags": ["Accounts"]
+      },
+      "post": {
+        "summary": "Create new financial account",
+        "tags": ["Accounts"]
+      }
+    },
+    "/transactions": {
+      "get": {
+        "summary": "Get transactions with filters and pagination",
+        "tags": ["Transactions"]
+      },
+      "post": {
+        "summary": "Record new income or expense with atomic ledger entry",
+        "tags": ["Transactions"]
+      }
+    },
+    "/transfers": {
+      "get": {
+        "summary": "List account transfers",
+        "tags": ["Transfers"]
+      },
+      "post": {
+        "summary": "Execute internal account transfer",
+        "tags": ["Transfers"]
+      }
+    },
+    "/dashboard/summary": {
+      "get": {
+        "summary": "Get dashboard KPI summary cards",
+        "tags": ["Dashboard"]
+      }
+    },
+    "/reports/monthly": {
+      "get": {
+        "summary": "Get monthly financial report with balances & breakdowns",
+        "tags": ["Reports"]
+      }
+    }
+  }
+}
