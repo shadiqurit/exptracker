@@ -2,9 +2,10 @@ module.exports = {
   apps: [
     {
       name: 'expense-tracker-api',
-      script: './backend/dist/app.js',
-      instances: 'max',
-      exec_mode: 'cluster',
+      cwd: './backend',
+      script: './dist/app.js',
+      instances: 1,
+      exec_mode: 'fork',
       autorestart: true,
       watch: false,
       max_memory_restart: '500M',
