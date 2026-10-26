@@ -20,15 +20,23 @@ async function handleLogin() {
 
   isLoading.value = true;
   try {
-    await authStore.login({ email: email.value, password: password.value });
+    await authStore.login({ email: email.value.trim(), password: password.value });
     toast.add({ severity: 'success', summary: 'Welcome back!', detail: 'Logged in successfully', life: 3000 });
     router.push('/dashboard');
   } catch (error: any) {
+    let errorMsg = 'Invalid email or password';
+    if (error.response?.status === 502 || error.response?.status === 503 || error.response?.status === 504) {
+      errorMsg = 'Backend service is unavailable (502/503/504). Please ensure the backend is running on port 3006.';
+    } else if (error.code === 'ERR_NETWORK' || !error.response) {
+      errorMsg = 'Cannot connect to backend server. Make sure API is running and reachable.';
+    } else if (error.response?.data?.message) {
+      errorMsg = error.response.data.message;
+    }
     toast.add({
       severity: 'error',
-      summary: 'Authentication Failed',
-      detail: error.response?.data?.message || 'Invalid email or password',
-      life: 4000,
+      summary: 'Login Failed',
+      detail: errorMsg,
+      life: 6000,
     });
   } finally {
     isLoading.value = false;

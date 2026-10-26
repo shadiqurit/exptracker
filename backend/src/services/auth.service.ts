@@ -98,8 +98,9 @@ export class AuthService {
     userAgent?: string,
     ipAddress?: string
   ) {
+    const normalizedEmail = email.toLowerCase().trim();
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
       include: {
         roles: { include: { role: true } },
       },
@@ -113,7 +114,10 @@ export class AuthService {
       throw new UnauthorizedError('Your account has been deactivated. Contact an administrator.');
     }
 
-    const isMatch = await argon2.verify(user.passwordHash, password);
+    let isMatch = await argon2.verify(user.passwordHash, password);
+    if (!isMatch && password.trim() !== password) {
+      isMatch = await argon2.verify(user.passwordHash, password.trim());
+    }
     if (!isMatch) {
       throw new UnauthorizedError('Invalid email or password');
     }
