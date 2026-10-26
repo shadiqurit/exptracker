@@ -33,7 +33,7 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-expense_tracker_jwt_refresh_super_secret_key_2026_#@!}
       JWT_ACCESS_EXPIRES_IN: 15m
       JWT_REFRESH_EXPIRES_IN: 7d
-      CORS_ORIGIN: "http://localhost,http://localhost:80,http://localhost:5173,http://localhost:3006"
+      CORS_ORIGIN: "http://localhost,http://localhost:80,http://localhost:5173,http://localhost:3006,https://exp.shadiqur.bd,http://exp.shadiqur.bd"
       COOKIE_SECURE: "false"
       COOKIE_SAME_SITE: "lax"
       DEFAULT_CURRENCY: "BDT"
