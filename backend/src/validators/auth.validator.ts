@@ -24,6 +24,18 @@ export const loginSchema = z.object({
   }),
 });
 
+export const googleAuthSchema = z.object({
+  body: z.object({
+    idToken: z.string().optional(),
+    accessToken: z.string().optional(),
+    email: z.string().email().optional(),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    avatarUrl: z.string().optional(),
+    googleId: z.string().optional(),
+  }),
+});
+
 export const updateProfileSchema = z.object({
   body: z.object({
     firstName: z.string().min(1).trim().optional(),

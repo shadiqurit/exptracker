@@ -19,11 +19,15 @@ async function initCapacitor() {
   if (!Capacitor.isNativePlatform()) return;
 
   try {
+    // Ensure native status bar does not overlap the web content
+    await StatusBar.setOverlaysWebView({ overlay: false });
+    await StatusBar.show();
+
     // Hide splash screen smoothly after app is ready
     await SplashScreen.hide();
 
     // Style native status bar
-    updateStatusBar();
+    await updateStatusBar();
 
     // Handle Android hardware back button
     CapApp.addListener('backButton', ({ canGoBack }) => {
@@ -42,12 +46,13 @@ async function initCapacitor() {
 async function updateStatusBar() {
   if (!Capacitor.isNativePlatform()) return;
   try {
+    await StatusBar.setOverlaysWebView({ overlay: false });
     if (themeStore.isDark) {
       await StatusBar.setStyle({ style: Style.Dark });
       await StatusBar.setBackgroundColor({ color: '#0f172a' });
     } else {
       await StatusBar.setStyle({ style: Style.Light });
-      await StatusBar.setBackgroundColor({ color: '#059669' });
+      await StatusBar.setBackgroundColor({ color: '#ffffff' });
     }
   } catch (e) {
     // Ignore in non-mobile

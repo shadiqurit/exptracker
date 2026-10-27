@@ -72,7 +72,9 @@ enum RecurringFrequency {
 model User {
   id              String       @id @default(uuid())
   email           String       @unique
-  passwordHash    String       @map("password_hash")
+  passwordHash    String?      @map("password_hash")
+  googleId        String?      @unique @map("google_id")
+  authProvider    String       @default("LOCAL") @map("auth_provider")
   firstName       String       @map("first_name")
   lastName        String       @map("last_name")
   phone           String?

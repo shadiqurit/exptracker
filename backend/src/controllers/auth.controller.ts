@@ -54,6 +54,29 @@ export class AuthController {
     }
   }
 
+  static async googleAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      const userAgent = req.headers['user-agent'];
+      const ipAddress = req.ip || req.socket.remoteAddress;
+
+      const result = await AuthService.googleAuth({
+        ...req.body,
+        userAgent,
+        ipAddress,
+      });
+
+      AuthController.setCookies(res, result.accessToken, result.refreshToken);
+
+      res.status(200).json({
+        success: true,
+        message: 'Google authentication successful',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async refresh(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const refreshToken = req.cookies.refreshToken || req.body.refreshToken;

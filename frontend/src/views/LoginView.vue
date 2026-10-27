@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/auth';
 import { useToast } from 'primevue/usetoast';
 import { getApiBaseUrl, setApiBaseUrl } from '../api/client';
 import Dialog from 'primevue/dialog';
+import GoogleAuthButton from '../components/GoogleAuthButton.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -94,7 +95,19 @@ async function handleLogin() {
         <p class="text-sm text-slate-500 dark:text-slate-400">Daily Expense & Income Management</p>
       </div>
 
-      <!-- Login Form -->
+      <!-- Google Sign In Option -->
+      <GoogleAuthButton mode="signin" />
+
+      <!-- Or continue with email divider -->
+      <div class="relative flex items-center justify-center">
+        <div class="border-t border-slate-200 dark:border-slate-700 w-full"></div>
+        <span class="bg-white dark:bg-slate-800 px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider shrink-0">
+          Or continue with email
+        </span>
+        <div class="border-t border-slate-200 dark:border-slate-700 w-full"></div>
+      </div>
+
+      <!-- Login Form (Email & Password) -->
       <form @submit.prevent="handleLogin" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>

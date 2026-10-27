@@ -63,16 +63,17 @@ function toggleUserMenu(event: Event) {
 </script>
 
 <template>
-  <header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-20 px-3.5 sm:px-6 lg:px-8 flex items-center justify-between">
-    <!-- Left: Mobile Toggle & Page context & Brand on mobile -->
-    <div class="flex items-center gap-2.5 sm:gap-3">
-      <button
-        @click="emit('toggleSidebar')"
-        class="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-        aria-label="Toggle navigation menu"
-      >
-        <i class="pi pi-bars text-lg"></i>
-      </button>
+  <header class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-20 pt-[env(safe-area-inset-top,0px)]">
+    <div class="h-16 px-3.5 sm:px-6 lg:px-8 flex items-center justify-between">
+      <!-- Left: Mobile Toggle & Page context & Brand on mobile -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <button
+          @click="emit('toggleSidebar')"
+          class="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          aria-label="Toggle navigation menu"
+        >
+          <i class="pi pi-bars text-lg"></i>
+        </button>
 
       <!-- Brand Logo shown on Mobile/Tablet when sidebar is hidden off-screen -->
       <div class="flex lg:hidden items-center gap-2 cursor-pointer" @click="router.push('/dashboard')">
@@ -153,13 +154,15 @@ function toggleUserMenu(event: Event) {
             {{ authStore.user?.roles?.[0] || 'User' }}
           </p>
         </div>
-        <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
-          {{ authStore.user?.firstName?.[0] || 'U' }}
+        <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-sm overflow-hidden">
+          <img v-if="authStore.user?.avatarUrl" :src="authStore.user.avatarUrl" alt="Avatar" class="w-full h-full object-cover" referrerpolicy="no-referrer" />
+          <span v-else>{{ authStore.user?.firstName?.[0] || 'U' }}</span>
         </div>
         <i class="pi pi-angle-down text-slate-400 text-xs"></i>
       </button>
 
       <Menu ref="userMenu" :model="menuItems" :popup="true" />
     </div>
+  </div>
   </header>
 </template>

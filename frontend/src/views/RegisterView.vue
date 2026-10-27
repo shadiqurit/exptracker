@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useToast } from 'primevue/usetoast';
+import GoogleAuthButton from '../components/GoogleAuthButton.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -43,6 +44,18 @@ async function handleRegister() {
       <div class="text-center space-y-2">
         <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">Create Your Account</h1>
         <p class="text-sm text-slate-500 dark:text-slate-400">Start managing your personal finances today</p>
+      </div>
+
+      <!-- Google Sign Up Option -->
+      <GoogleAuthButton mode="signup" />
+
+      <!-- Or continue with email divider -->
+      <div class="relative flex items-center justify-center">
+        <div class="border-t border-slate-200 dark:border-slate-700 w-full"></div>
+        <span class="bg-white dark:bg-slate-800 px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider shrink-0">
+          Or register with email
+        </span>
+        <div class="border-t border-slate-200 dark:border-slate-700 w-full"></div>
       </div>
 
       <form @submit.prevent="handleRegister" class="space-y-4">

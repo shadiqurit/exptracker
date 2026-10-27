@@ -5,6 +5,7 @@ export interface User {
   lastName: string;
   phone?: string | null;
   avatarUrl?: string | null;
+  authProvider?: string | null;
   defaultCurrency: string;
   timezone: string;
   roles: string[];

@@ -39,6 +39,24 @@ export const useAuthStore = defineStore('auth', () => {
     return res.data;
   }
 
+  async function googleLogin(googlePayload: {
+    idToken?: string;
+    accessToken?: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    avatarUrl?: string;
+    googleId?: string;
+  }) {
+    const res = await apiClient.post('/auth/google', googlePayload);
+    const { user: userData, accessToken } = res.data.data;
+    user.value = userData;
+    token.value = accessToken;
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('access_token', accessToken);
+    return res.data;
+  }
+
   async function fetchProfile() {
     try {
       const res = await apiClient.get('/auth/me');
@@ -76,6 +94,7 @@ export const useAuthStore = defineStore('auth', () => {
     isSuperAdmin,
     login,
     register,
+    googleLogin,
     fetchProfile,
     updateProfile,
     logout,

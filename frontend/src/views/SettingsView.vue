@@ -15,6 +15,19 @@ const serverUrlInput = ref(localStorage.getItem('api_server_url') || '');
 const currentServerUrl = ref(getApiBaseUrl());
 const isTestingServer = ref(false);
 
+const googleClientIdInput = ref(localStorage.getItem('google_client_id') || import.meta.env.VITE_GOOGLE_CLIENT_ID || '');
+
+function handleSaveGoogleClientId() {
+  const val = googleClientIdInput.value.trim();
+  if (val) {
+    localStorage.setItem('google_client_id', val);
+    toast.add({ severity: 'success', summary: 'Saved', detail: 'Google Client ID updated successfully', life: 3000 });
+  } else {
+    localStorage.removeItem('google_client_id');
+    toast.add({ severity: 'info', summary: 'Reset', detail: 'Google Client ID cleared', life: 3000 });
+  }
+}
+
 async function handleSaveServerUrl() {
   isTestingServer.value = true;
   try {
@@ -119,8 +132,9 @@ async function handleChangePassword() {
     <!-- Profile Preferences Card -->
     <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700/60 shadow-sm space-y-6">
       <div class="flex items-center gap-4">
-        <div class="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
-          {{ authStore.user?.firstName?.[0] || 'U' }}
+        <div class="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xl shadow-md overflow-hidden">
+          <img v-if="authStore.user?.avatarUrl" :src="authStore.user.avatarUrl" alt="Avatar" class="w-full h-full object-cover" referrerpolicy="no-referrer" />
+          <span v-else>{{ authStore.user?.firstName?.[0] || 'U' }}</span>
         </div>
         <div>
           <h2 class="text-base font-bold text-slate-900 dark:text-white">{{ authStore.user?.firstName }} {{ authStore.user?.lastName }}</h2>
@@ -298,6 +312,46 @@ async function handleChangePassword() {
           >
             <i v-if="isTestingServer" class="pi pi-spin pi-spinner text-xs"></i>
             <span>{{ isTestingServer ? 'Testing...' : 'Save & Test' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Google OAuth Client ID Card -->
+    <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700/60 shadow-sm space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">
+            <i class="pi pi-google"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900 dark:text-white">Google Sign-In Configuration</h2>
+            <p class="text-xs text-slate-400">OAuth 2.0 Web Client ID for Google / Gmail authentication</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <input
+          v-model="googleClientIdInput"
+          type="text"
+          placeholder="your-client-id.apps.googleusercontent.com"
+          class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+        />
+        <div class="flex gap-2">
+          <button
+            type="button"
+            @click="googleClientIdInput = ''; handleSaveGoogleClientId()"
+            class="px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
+          >
+            Clear
+          </button>
+          <button
+            type="button"
+            @click="handleSaveGoogleClientId"
+            class="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:opacity-90 flex items-center gap-2"
+          >
+            <span>Save Client ID</span>
           </button>
         </div>
       </div>

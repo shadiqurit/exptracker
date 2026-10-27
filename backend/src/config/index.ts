@@ -40,6 +40,9 @@ export const config = {
     currency: process.env.DEFAULT_CURRENCY || 'BDT',
     timezone: process.env.DEFAULT_TIMEZONE || 'Asia/Dhaka',
   },
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID || '',
+  },
   uploadDir: process.env.UPLOAD_DIR || './uploads',
   logLevel: process.env.LOG_LEVEL || 'info',
 };

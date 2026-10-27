@@ -55,6 +55,7 @@ function navigate(path: string) {
   <aside
     :class="[
       'fixed left-0 top-0 bottom-0 z-50 flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out',
+      'pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]',
       // Mobile / Tablet drawer sizing and off-canvas translate:
       'w-72 max-w-[85vw] lg:max-w-none',
       mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full',
