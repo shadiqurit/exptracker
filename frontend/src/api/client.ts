@@ -1,7 +1,47 @@
 import axios from 'axios';
+import { Capacitor } from '@capacitor/core';
+
+export const getApiBaseUrl = (): string => {
+  // 1. User manual override saved in localStorage
+  const savedUrl = localStorage.getItem('api_server_url');
+  if (savedUrl && savedUrl.trim()) {
+    let clean = savedUrl.trim();
+    if (!clean.endsWith('/api/v1')) {
+      clean = clean.replace(/\/+$/, '') + '/api/v1';
+    }
+    return clean;
+  }
+
+  // 2. Build-time environment variable
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+
+  // 3. Native Android / iOS app detection
+  if (Capacitor.isNativePlatform() || window.location.protocol === 'capacitor:' || (window.location.hostname === 'localhost' && !window.location.port)) {
+    return 'https://exp.shadiqur.bd/api/v1';
+  }
+
+  // 4. Default for Web browser (relative path matches current origin or Vite proxy)
+  return '/api/v1';
+};
+
+export const setApiBaseUrl = (newUrl: string | null) => {
+  if (newUrl && newUrl.trim()) {
+    let clean = newUrl.trim();
+    if (!clean.endsWith('/api/v1')) {
+      clean = clean.replace(/\/+$/, '') + '/api/v1';
+    }
+    localStorage.setItem('api_server_url', clean);
+    apiClient.defaults.baseURL = clean;
+  } else {
+    localStorage.removeItem('api_server_url');
+    apiClient.defaults.baseURL = getApiBaseUrl();
+  }
+};
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1',
+  baseURL: getApiBaseUrl(),
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -9,6 +49,7 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
+  config.baseURL = getApiBaseUrl();
   const token = localStorage.getItem('access_token');
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -52,7 +93,7 @@ apiClient.interceptors.response.use(
 
       try {
         const { data } = await axios.post(
-          `${import.meta.env.VITE_API_URL || '/api/v1'}/auth/refresh`,
+          `${getApiBaseUrl()}/auth/refresh`,
           {},
           { withCredentials: true }
         );

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
-import { apiClient } from '../api/client';
+import { apiClient, getApiBaseUrl } from '../api/client';
 import { Account } from '../types';
 import dayjs from 'dayjs';
 
@@ -98,7 +98,7 @@ function downloadExport(format: 'pdf' | 'excel' | 'csv') {
   if (activeTab.value === 'yearly') params.year = selectedYear.value;
   if (activeTab.value === 'account') params.accountId = selectedAccountId.value;
 
-  const url = `${import.meta.env.VITE_API_URL || '/api/v1'}/reports/export?${new URLSearchParams(params).toString()}`;
+  const url = `${getApiBaseUrl()}/reports/export?${new URLSearchParams(params).toString()}`;
   window.open(url, '_blank');
 }
 

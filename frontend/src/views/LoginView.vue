@@ -3,6 +3,8 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useToast } from 'primevue/usetoast';
+import { getApiBaseUrl, setApiBaseUrl } from '../api/client';
+import Dialog from 'primevue/dialog';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -11,6 +13,42 @@ const toast = useToast();
 const email = ref('');
 const password = ref('');
 const isLoading = ref(false);
+
+const currentServer = ref(getApiBaseUrl());
+const showServerModal = ref(false);
+const customServerInput = ref(localStorage.getItem('api_server_url') || '');
+const isTestingServer = ref(false);
+
+async function testAndSaveServer() {
+  isTestingServer.value = true;
+  try {
+    let target = customServerInput.value.trim();
+    if (!target) {
+      setApiBaseUrl(null);
+      currentServer.value = getApiBaseUrl();
+      toast.add({ severity: 'info', summary: 'Reset', detail: 'Reset to default server', life: 3000 });
+      showServerModal.value = false;
+      return;
+    }
+    if (!target.startsWith('http://') && !target.startsWith('https://')) {
+      target = 'https://' + target;
+    }
+    const checkUrl = target.endsWith('/health') ? target : (target.replace(/\/+$/, '') + '/health');
+    const res = await fetch(checkUrl, { method: 'GET' });
+    if (res.ok) {
+      setApiBaseUrl(target);
+      currentServer.value = getApiBaseUrl();
+      toast.add({ severity: 'success', summary: 'Connected', detail: 'Server reached successfully', life: 3000 });
+      showServerModal.value = false;
+    } else {
+      toast.add({ severity: 'warn', summary: 'Server Warning', detail: `Server responded with status ${res.status}`, life: 4000 });
+    }
+  } catch (err: any) {
+    toast.add({ severity: 'error', summary: 'Connection Failed', detail: 'Could not connect to specified server URL', life: 4000 });
+  } finally {
+    isTestingServer.value = false;
+  }
+}
 
 async function handleLogin() {
   if (!email.value || !password.value) {
@@ -103,6 +141,62 @@ async function handleLogin() {
           Create account
         </router-link>
       </div>
+
+      <!-- Server Connection Indicator -->
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+        <span class="flex items-center gap-1.5 truncate max-w-[220px]">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <span class="truncate">Server: {{ currentServer.replace(/^https?:\/\//, '') }}</span>
+        </span>
+        <button
+          type="button"
+          @click="showServerModal = true"
+          class="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold text-[11px] shrink-0"
+        >
+          Change
+        </button>
+      </div>
     </div>
+
+    <!-- Server Configuration Modal -->
+    <Dialog
+      v-model:visible="showServerModal"
+      modal
+      header="API Server Connection"
+      :style="{ width: '92vw', maxWidth: '28rem' }"
+    >
+      <div class="space-y-4 pt-2">
+        <p class="text-xs text-slate-500 dark:text-slate-400">
+          Set the backend API server for this device. Default is <code class="font-mono bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">https://exp.shadiqur.bd</code>.
+        </p>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Server URL</label>
+          <input
+            v-model="customServerInput"
+            type="text"
+            placeholder="https://exp.shadiqur.bd"
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+          />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button
+            type="button"
+            @click="customServerInput = ''; testAndSaveServer()"
+            class="px-3 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
+            Reset Default
+          </button>
+          <button
+            type="button"
+            :disabled="isTestingServer"
+            @click="testAndSaveServer"
+            class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-md hover:bg-emerald-700 disabled:opacity-50 flex items-center gap-1.5"
+          >
+            <i v-if="isTestingServer" class="pi pi-spin pi-spinner text-xs"></i>
+            <span>{{ isTestingServer ? 'Connecting...' : 'Save & Connect' }}</span>
+          </button>
+        </div>
+      </div>
+    </Dialog>
   </div>
 </template>
