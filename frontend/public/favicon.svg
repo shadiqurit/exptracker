@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="expGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="50%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#14b8a6" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#059669" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="512" height="512" rx="128" fill="url(#expGrad)" filter="url(#shadow)" />
+
+  <!-- Subtle Inner Border Highlight -->
+  <rect x="8" y="8" width="496" height="496" rx="120" fill="none" stroke="white" stroke-opacity="0.2" stroke-width="4" />
+
+  <!-- Dollar Symbol -->
+  <g fill="white" transform="translate(256, 256)">
+    <!-- Vertical Bar -->
+    <rect x="-14" y="-170" width="28" height="340" rx="14" fill="white" />
+    <!-- S Curves -->
+    <path d="M 60 -105 C 60 -135 15 -150 -35 -150 C -95 -150 -125 -120 -125 -75 C -125 -10 -50 15 20 35 C 75 52 105 75 105 120 C 105 170 65 195 -15 195 C -75 195 -120 170 -130 120 L -80 108 C -72 140 -40 155 -15 155 C 30 155 58 135 58 98 C 58 55 5 32 -60 12 C -115 -7 -170 -35 -170 -95 C -170 -150 -115 -190 -35 -190 C 25 -190 75 -165 95 -120 Z" fill="white" />
+  </g>
+</svg>

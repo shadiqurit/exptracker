@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import { usePWAStore } from '../stores/pwa';
 
 const props = defineProps<{
   desktopCollapsed: boolean;
@@ -16,6 +17,7 @@ const emit = defineEmits<{
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const pwaStore = usePWAStore();
 
 const navItems = computed(() => {
   const items = [
@@ -125,6 +127,41 @@ function navigate(path: string) {
         <span :class="['truncate', desktopCollapsed ? 'lg:hidden' : 'inline']">{{ item.label }}</span>
       </button>
     </nav>
+
+    <!-- Install Mobile App Card (When not installed) -->
+    <div v-if="!pwaStore.isInstalled" class="p-3 border-t border-slate-100 dark:border-slate-800/80">
+      <div
+        :class="[
+          'p-3 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 text-slate-800 dark:text-slate-100',
+          desktopCollapsed ? 'lg:p-2 lg:flex lg:justify-center' : ''
+        ]"
+      >
+        <div :class="desktopCollapsed ? 'lg:hidden' : 'block'">
+          <div class="flex items-center gap-2 mb-1">
+            <i class="pi pi-mobile text-emerald-600 dark:text-emerald-400 text-sm"></i>
+            <span class="text-xs font-bold text-slate-900 dark:text-white">Mobile App</span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-2">Install on your home screen for quick offline access</p>
+          <button
+            @click="pwaStore.installApp"
+            class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5"
+          >
+            <i class="pi pi-download text-xs"></i>
+            <span>Install App</span>
+          </button>
+        </div>
+
+        <!-- Collapsed Desktop Icon Button -->
+        <button
+          v-if="desktopCollapsed"
+          @click="pwaStore.installApp"
+          class="hidden lg:flex w-10 h-10 rounded-xl bg-emerald-600 text-white items-center justify-center shadow-sm hover:bg-emerald-700 transition-colors"
+          title="Install ExpTracker App"
+        >
+          <i class="pi pi-download text-base"></i>
+        </button>
+      </div>
+    </div>
 
     <!-- User Mini Profile Footer -->
     <div class="p-3 border-t border-slate-100 dark:border-slate-800/80">

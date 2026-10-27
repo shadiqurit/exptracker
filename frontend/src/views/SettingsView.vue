@@ -2,11 +2,13 @@
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '../stores/auth';
 import { useThemeStore } from '../stores/theme';
+import { usePWAStore } from '../stores/pwa';
 import { apiClient } from '../api/client';
 import { useToast } from 'primevue/usetoast';
 
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
+const pwaStore = usePWAStore();
 const toast = useToast();
 
 const profileForm = ref({
@@ -224,6 +226,65 @@ async function handleChangePassword() {
         <i :class="themeStore.isDark ? 'pi pi-sun text-amber-400' : 'pi pi-moon text-slate-600'"></i>
         <span>{{ themeStore.isDark ? 'Switch to Light' : 'Switch to Dark' }}</span>
       </button>
+    </div>
+
+    <!-- Mobile App / PWA Installation Card -->
+    <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700/60 shadow-sm space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl shrink-0">
+            <i class="pi pi-mobile"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-bold text-slate-900 dark:text-white">Mobile Application (PWA)</h2>
+              <span
+                :class="[
+                  'text-[10px] uppercase font-bold px-2 py-0.5 rounded-full',
+                  pwaStore.isInstalled
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                    : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+                ]"
+              >
+                {{ pwaStore.isInstalled ? 'Installed' : 'Web Version' }}
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">
+              Install ExpTracker directly on Android, iPhone, iPad, or desktop for a fullscreen app experience.
+            </p>
+          </div>
+        </div>
+
+        <button
+          v-if="!pwaStore.isInstalled"
+          @click="pwaStore.installApp"
+          class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20 transition-all self-start sm:self-auto shrink-0"
+        >
+          <i class="pi pi-download text-xs"></i>
+          <span>Install on this Device</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs text-slate-500 dark:text-slate-400">
+        <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 space-y-1">
+          <p class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+            <i class="pi pi-bolt text-emerald-500"></i> Instant Launch
+          </p>
+          <p class="text-[11px]">Opens immediately from your phone home screen without browser chrome.</p>
+        </div>
+        <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 space-y-1">
+          <p class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+            <i class="pi pi-cloud text-blue-500"></i> Offline Cache
+          </p>
+          <p class="text-[11px]">Core financial ledger shell and styles are cached locally for fast responsiveness.</p>
+        </div>
+        <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 space-y-1">
+          <p class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+            <i class="pi pi-shield text-indigo-500"></i> Encrypted HTTPS
+          </p>
+          <p class="text-[11px]">Enterprise banking-grade transport layer security with zero app store bloat.</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>

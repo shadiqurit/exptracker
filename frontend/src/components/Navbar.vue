@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useThemeStore } from '../stores/theme';
+import { usePWAStore } from '../stores/pwa';
 import Menu from 'primevue/menu';
 
 defineProps<{
@@ -16,31 +17,45 @@ const emit = defineEmits<{
 const router = useRouter();
 const authStore = useAuthStore();
 const themeStore = useThemeStore();
+const pwaStore = usePWAStore();
 const userMenu = ref();
 
-const menuItems = ref([
-  {
-    label: 'Profile Settings',
-    icon: 'pi pi-user',
-    command: () => router.push('/settings'),
-  },
-  {
-    label: 'Accounts',
-    icon: 'pi pi-wallet',
-    command: () => router.push('/accounts'),
-  },
-  {
-    separator: true,
-  },
-  {
-    label: 'Sign Out',
-    icon: 'pi pi-sign-out',
-    command: async () => {
-      await authStore.logout();
-      router.push('/login');
+const menuItems = computed(() => {
+  const items: any[] = [
+    {
+      label: 'Profile Settings',
+      icon: 'pi pi-user',
+      command: () => router.push('/settings'),
     },
-  },
-]);
+    {
+      label: 'Accounts',
+      icon: 'pi pi-wallet',
+      command: () => router.push('/accounts'),
+    },
+  ];
+
+  if (!pwaStore.isInstalled) {
+    items.push({
+      label: 'Install Mobile App',
+      icon: 'pi pi-download',
+      command: () => pwaStore.installApp(),
+    });
+  }
+
+  items.push(
+    { separator: true },
+    {
+      label: 'Sign Out',
+      icon: 'pi pi-sign-out',
+      command: async () => {
+        await authStore.logout();
+        router.push('/login');
+      },
+    }
+  );
+
+  return items;
+});
 
 function toggleUserMenu(event: Event) {
   userMenu.value.toggle(event);
@@ -80,6 +95,17 @@ function toggleUserMenu(event: Event) {
 
     <!-- Right Actions -->
     <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Install App Button (Visible when not yet installed in standalone mode) -->
+      <button
+        v-if="!pwaStore.isInstalled"
+        @click="pwaStore.installApp"
+        class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors shadow-sm"
+        title="Install Mobile / Desktop App"
+      >
+        <i class="pi pi-download text-xs"></i>
+        <span class="hidden sm:inline">Install App</span>
+      </button>
+
       <!-- Quick Action Buttons -->
       <button
         @click="router.push('/income')"
