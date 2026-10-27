@@ -79,9 +79,7 @@ async function handleNativeGoogleLogin(clientId: string) {
 
     const res = await SocialLogin.login({
       provider: 'google',
-      options: {
-        scopes: ['email', 'profile'],
-      },
+      options: {},
     });
 
     const result = res.result as any;
