@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { Capacitor } from '@capacitor/core';
 
 export const usePWAStore = defineStore('pwa', () => {
   const canInstall = ref(false);
@@ -7,10 +8,12 @@ export const usePWAStore = defineStore('pwa', () => {
   const deferredPrompt = ref<any>(null);
   const showIOSGuide = ref(false);
 
-  const isIOS = computed(() => {
-    if (typeof window === 'undefined') return false;
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    return /iphone|ipad|ipod/.test(userAgent) && !(window as any).MSStream;
+  const isNativeApp = computed(() => {
+    try {
+      return Capacitor.isNativePlatform();
+    } catch {
+      return false;
+    }
   });
 
   const isStandalone = computed(() => {
@@ -22,19 +25,59 @@ export const usePWAStore = defineStore('pwa', () => {
     );
   });
 
+  const isAndroidApp = computed(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+        return true;
+      }
+    } catch {}
+    if (document.referrer.includes('android-app://')) {
+      return true;
+    }
+    const ua = window.navigator.userAgent.toLowerCase();
+    if (/android/.test(ua) && (isStandalone.value || /wv/.test(ua))) {
+      return true;
+    }
+    return false;
+  });
+
+  const isIOS = computed(() => {
+    if (typeof window === 'undefined') return false;
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    return /iphone|ipad|ipod/.test(userAgent) && !(window as any).MSStream;
+  });
+
+  // True ONLY when running as a web app in a regular web browser (not native app, not android app, not standalone)
+  const isWebBrowser = computed(() => {
+    if (typeof window === 'undefined') return false;
+    if (isNativeApp.value) return false;
+    if (isAndroidApp.value) return false;
+    if (isStandalone.value) return false;
+    return true;
+  });
+
+  // App install is only offered when accessed from web apps in browsers and not yet installed
+  const canInstallInBrowser = computed(() => {
+    return isWebBrowser.value && !isInstalled.value;
+  });
+
   function initPWA() {
     if (typeof window === 'undefined') return;
 
-    // Check if currently running in standalone PWA mode
-    if (isStandalone.value) {
+    // If running in native Android/iOS app or standalone installed mode, disable install
+    if (isNativeApp.value || isAndroidApp.value || isStandalone.value) {
       isInstalled.value = true;
       canInstall.value = false;
-    } else if (isIOS.value) {
+      return;
+    }
+
+    if (isIOS.value) {
       // iOS doesn't support beforeinstallprompt, but can be added to home screen
       canInstall.value = true;
     }
 
-    // Register Service Worker
+    // Register Service Worker for web browser
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
@@ -48,8 +91,9 @@ export const usePWAStore = defineStore('pwa', () => {
       });
     }
 
-    // Capture standard install prompt (Android, Chrome, Edge, Samsung Internet)
+    // Capture standard install prompt (Chrome, Edge, Samsung Internet)
     window.addEventListener('beforeinstallprompt', (e: Event) => {
+      if (!isWebBrowser.value) return;
       e.preventDefault();
       deferredPrompt.value = e;
       canInstall.value = true;
@@ -66,12 +110,17 @@ export const usePWAStore = defineStore('pwa', () => {
   }
 
   async function installApp() {
+    if (!canInstallInBrowser.value) {
+      return;
+    }
+
     if (deferredPrompt.value) {
       deferredPrompt.value.prompt();
       const choiceResult = await deferredPrompt.value.userChoice;
       if (choiceResult.outcome === 'accepted') {
         console.log('[PWA] User accepted the install prompt');
         canInstall.value = false;
+        isInstalled.value = true;
       } else {
         console.log('[PWA] User dismissed the install prompt');
       }
@@ -93,6 +142,10 @@ export const usePWAStore = defineStore('pwa', () => {
     isInstalled,
     isIOS,
     isStandalone,
+    isNativeApp,
+    isAndroidApp,
+    isWebBrowser,
+    canInstallInBrowser,
     showIOSGuide,
     initPWA,
     installApp,

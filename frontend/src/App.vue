@@ -63,10 +63,10 @@ watch(() => themeStore.isDark, () => {
   updateStatusBar();
 });
 
-onMounted(() => {
+onMounted(async () => {
   themeStore.initTheme();
+  await initCapacitor();
   pwaStore.initPWA();
-  initCapacitor();
 });
 </script>
 
