@@ -14,6 +14,7 @@ const toast = useToast();
 const googleClientIdInput = ref(localStorage.getItem('google_client_id') || import.meta.env.VITE_GOOGLE_CLIENT_ID || '');
 
 function handleSaveGoogleClientId() {
+  if (!authStore.isSuperAdmin) return;
   const val = googleClientIdInput.value.trim();
   if (val) {
     localStorage.setItem('google_client_id', val);
@@ -242,8 +243,11 @@ async function handleChangePassword() {
       </button>
     </div>
 
-    <!-- Google OAuth Client ID Card -->
-    <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700/60 shadow-sm space-y-4">
+    <!-- Google OAuth Client ID Card (Super Admin Only) -->
+    <div
+      v-if="authStore.isSuperAdmin"
+      class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700/60 shadow-sm space-y-4"
+    >
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">

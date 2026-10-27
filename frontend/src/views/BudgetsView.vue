@@ -292,9 +292,9 @@ function confirmDelete(b: Budget) {
           <input
             v-model.number="form.amount"
             type="number"
-            step="100"
+            step="any"
             required
-            min="1"
+            min="0.01"
             class="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-bold"
           />
         </div>
