@@ -12,12 +12,17 @@ import { errorHandler } from './middleware/errorHandler.js';
 import fs from 'fs';
 import path from 'path';
 
-const swaggerPathSrc = path.resolve(process.cwd(), 'src/docs/swagger.json');
-const swaggerPathDist = path.resolve(process.cwd(), 'dist/docs/swagger.json');
-const swaggerPath = fs.existsSync(swaggerPathSrc) ? swaggerPathSrc : swaggerPathDist;
-const swaggerDocument = fs.existsSync(swaggerPath)
-  ? JSON.parse(fs.readFileSync(swaggerPath, 'utf-8'))
-  : {};
+const swaggerCandidates = [
+  path.resolve(process.cwd(), 'src/docs/swagger.json'),
+  path.resolve(process.cwd(), 'dist/docs/swagger.json'),
+  path.resolve(process.cwd(), 'backend/src/docs/swagger.json'),
+  path.resolve(process.cwd(), 'backend/dist/docs/swagger.json'),
+  path.resolve(__dirname, 'docs/swagger.json'),
+  path.resolve(__dirname, '../src/docs/swagger.json'),
+  path.resolve(__dirname, '../dist/docs/swagger.json'),
+];
+const swaggerPath = swaggerCandidates.find((p) => fs.existsSync(p));
+const swaggerDocument = swaggerPath ? JSON.parse(fs.readFileSync(swaggerPath, 'utf-8')) : {};
 
 const app = express();
 

@@ -1,17 +1,67 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import Toast from 'primevue/toast';
 import ConfirmDialog from 'primevue/confirmdialog';
 import { useThemeStore } from './stores/theme';
 import { usePWAStore } from './stores/pwa';
 import InstallPromptModal from './components/InstallPromptModal.vue';
+import { Capacitor } from '@capacitor/core';
+import { App as CapApp } from '@capacitor/app';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { SplashScreen } from '@capacitor/splash-screen';
 
+const router = useRouter();
 const themeStore = useThemeStore();
 const pwaStore = usePWAStore();
+
+async function initCapacitor() {
+  if (!Capacitor.isNativePlatform()) return;
+
+  try {
+    // Hide splash screen smoothly after app is ready
+    await SplashScreen.hide();
+
+    // Style native status bar
+    updateStatusBar();
+
+    // Handle Android hardware back button
+    CapApp.addListener('backButton', ({ canGoBack }) => {
+      const currentPath = router.currentRoute.value.path;
+      if (currentPath === '/dashboard' || currentPath === '/login' || !canGoBack) {
+        CapApp.exitApp();
+      } else {
+        router.back();
+      }
+    });
+  } catch (e) {
+    console.warn('[Capacitor] Init error:', e);
+  }
+}
+
+async function updateStatusBar() {
+  if (!Capacitor.isNativePlatform()) return;
+  try {
+    if (themeStore.isDark) {
+      await StatusBar.setStyle({ style: Style.Dark });
+      await StatusBar.setBackgroundColor({ color: '#0f172a' });
+    } else {
+      await StatusBar.setStyle({ style: Style.Light });
+      await StatusBar.setBackgroundColor({ color: '#059669' });
+    }
+  } catch (e) {
+    // Ignore in non-mobile
+  }
+}
+
+watch(() => themeStore.isDark, () => {
+  updateStatusBar();
+});
 
 onMounted(() => {
   themeStore.initTheme();
   pwaStore.initPWA();
+  initCapacitor();
 });
 </script>
 
