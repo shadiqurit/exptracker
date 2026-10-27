@@ -95,9 +95,9 @@ function confirmToggleStatus(u: any) {
 
     <!-- User Management Table -->
     <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/60 shadow-sm overflow-hidden">
-      <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between gap-4">
+      <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h3 class="text-sm font-bold text-slate-900 dark:text-white">Registered Users Directory</h3>
-        <div class="relative w-64">
+        <div class="relative w-full sm:w-64">
           <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
           <input
             v-model="searchQuery"
@@ -113,7 +113,7 @@ function confirmToggleStatus(u: any) {
         <p>Loading users...</p>
       </div>
 
-      <div v-else class="overflow-x-auto">
+      <div v-else class="overflow-x-auto touch-scroll">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-500 font-bold uppercase text-[10px]">
             <tr>

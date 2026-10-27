@@ -213,11 +213,11 @@ const dailyTrendOption = computed(() => ({
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Overview of multi-account balances, income, expenses & budgets</p>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2.5 w-full md:w-auto">
         <!-- Account Filter -->
         <select
           v-model="selectedAccount"
-          class="text-xs font-medium px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+          class="flex-1 md:flex-none text-xs font-medium px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
         >
           <option value="">All Financial Accounts</option>
           <option v-for="acc in accounts" :key="acc.id" :value="acc.id">
@@ -227,7 +227,7 @@ const dailyTrendOption = computed(() => ({
 
         <button
           @click="loadDashboardData"
-          class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-800 transition-colors"
+          class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-800 transition-colors shrink-0"
           title="Refresh dashboard"
         >
           <i :class="['pi pi-refresh text-xs', isLoading ? 'pi-spin' : '']"></i>

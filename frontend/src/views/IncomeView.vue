@@ -163,7 +163,7 @@ function confirmDelete(tx: Transaction) {
     </div>
 
     <!-- Filters Strip -->
-    <div class="flex flex-wrap items-center gap-3 p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 shadow-sm">
+    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/60 shadow-sm">
       <div class="flex-1 min-w-[200px]">
         <div class="relative">
           <i class="pi pi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -208,7 +208,7 @@ function confirmDelete(tx: Transaction) {
         <p class="text-xs text-slate-400 max-w-sm mx-auto">Get started by clicking "Record Income" above to register your first earnings.</p>
       </div>
 
-      <div v-else class="overflow-x-auto">
+      <div v-else class="overflow-x-auto touch-scroll">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider text-[11px]">
             <tr>
@@ -261,9 +261,9 @@ function confirmDelete(tx: Transaction) {
     </div>
 
     <!-- Income Dialog -->
-    <Dialog v-model:visible="showDialog" modal :header="isEditing ? 'Edit Income Transaction' : 'Record New Income'" :style="{ width: '32rem' }">
+    <Dialog v-model:visible="showDialog" modal :header="isEditing ? 'Edit Income Transaction' : 'Record New Income'" :style="{ width: '92vw', maxWidth: '32rem' }">
       <form @submit.prevent="handleSaveIncome" class="space-y-4 pt-2">
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Financial Account</label>
             <select
@@ -286,7 +286,7 @@ function confirmDelete(tx: Transaction) {
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Amount (BDT)</label>
             <input
@@ -318,7 +318,7 @@ function confirmDelete(tx: Transaction) {
           />
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Payer / Source</label>
             <input
@@ -337,17 +337,17 @@ function confirmDelete(tx: Transaction) {
           </div>
         </div>
 
-        <div class="flex justify-end gap-2 pt-4">
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4">
           <button
             type="button"
             @click="showDialog = false"
-            class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+            class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 text-center"
           >
             Cancel
           </button>
           <button
             type="submit"
-            class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+            class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
           >
             {{ isEditing ? 'Update Income' : 'Record Income' }}
           </button>

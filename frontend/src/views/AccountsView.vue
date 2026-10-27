@@ -243,7 +243,7 @@ async function viewStatement(acc: Account) {
     </div>
 
     <!-- Create Account Modal -->
-    <Dialog v-model:visible="showCreateDialog" modal header="Create Financial Account" :style="{ width: '30rem' }">
+    <Dialog v-model:visible="showCreateDialog" modal header="Create Financial Account" :style="{ width: '92vw', maxWidth: '30rem' }">
       <form @submit.prevent="handleCreateAccount" class="space-y-4 pt-2">
         <div>
           <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Account Name</label>
@@ -255,7 +255,7 @@ async function viewStatement(acc: Account) {
           />
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Account Type</label>
             <select
@@ -277,7 +277,7 @@ async function viewStatement(acc: Account) {
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Bank / Provider</label>
             <input
@@ -296,17 +296,17 @@ async function viewStatement(acc: Account) {
           </div>
         </div>
 
-        <div class="flex justify-end gap-2 pt-4">
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4">
           <button
             type="button"
             @click="showCreateDialog = false"
-            class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+            class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 text-center"
           >
             Cancel
           </button>
           <button
             type="submit"
-            class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+            class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
           >
             Save Account
           </button>
@@ -315,7 +315,7 @@ async function viewStatement(acc: Account) {
     </Dialog>
 
     <!-- Edit Account Modal -->
-    <Dialog v-model:visible="showEditDialog" modal header="Edit Account" :style="{ width: '30rem' }">
+    <Dialog v-model:visible="showEditDialog" modal header="Edit Account" :style="{ width: '92vw', maxWidth: '30rem' }">
       <form @submit.prevent="handleUpdateAccount" class="space-y-4 pt-2">
         <div>
           <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Account Name</label>
@@ -326,7 +326,7 @@ async function viewStatement(acc: Account) {
           />
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Bank Name</label>
             <input
@@ -343,17 +343,17 @@ async function viewStatement(acc: Account) {
           </div>
         </div>
 
-        <div class="flex justify-end gap-2 pt-4">
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4">
           <button
             type="button"
             @click="showEditDialog = false"
-            class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+            class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 text-center"
           >
             Cancel
           </button>
           <button
             type="submit"
-            class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+            class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
           >
             Update Account
           </button>
@@ -362,14 +362,14 @@ async function viewStatement(acc: Account) {
     </Dialog>
 
     <!-- Account Statement Dialog -->
-    <Dialog v-model:visible="showStatementDialog" modal :header="`Account Statement — ${selectedAccount?.name}`" :style="{ width: '48rem' }">
+    <Dialog v-model:visible="showStatementDialog" modal :header="`Account Statement — ${selectedAccount?.name}`" :style="{ width: '94vw', maxWidth: '48rem' }">
       <div v-if="isStatementLoading" class="p-8 text-center text-slate-400 text-xs">
         <i class="pi pi-spin pi-spinner text-lg mb-2"></i>
         <p>Loading ledger entries...</p>
       </div>
       <div v-else-if="statementData" class="space-y-4">
         <!-- Summary Strip -->
-        <div class="grid grid-cols-2 gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800">
           <div>
             <span class="text-[11px] text-slate-400 uppercase font-semibold">Opening Balance</span>
             <p class="text-xl font-bold text-slate-900 dark:text-white">৳{{ statementData.periodOpeningBalance.toLocaleString() }}</p>
@@ -381,7 +381,7 @@ async function viewStatement(acc: Account) {
         </div>
 
         <!-- Ledger Entries Table -->
-        <div class="overflow-x-auto max-h-96">
+        <div class="overflow-x-auto touch-scroll max-h-96">
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold sticky top-0">
               <tr>

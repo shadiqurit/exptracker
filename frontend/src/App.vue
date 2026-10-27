@@ -13,6 +13,6 @@ onMounted(() => {
 
 <template>
   <Toast position="top-right" />
-  <ConfirmDialog />
+  <ConfirmDialog :style="{ width: '92vw', maxWidth: '28rem' }" />
   <router-view />
 </template>

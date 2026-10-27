@@ -146,7 +146,7 @@ function changePage(p: number) {
         No transactions matching current filters
       </div>
 
-      <div v-else class="overflow-x-auto">
+      <div v-else class="overflow-x-auto touch-scroll">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider text-[11px]">
             <tr>
@@ -191,20 +191,20 @@ function changePage(p: number) {
       </div>
 
       <!-- Pagination Footer -->
-      <div v-if="totalPages > 1" class="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
-        <span>Page {{ page }} of {{ totalPages }}</span>
-        <div class="flex items-center gap-1">
+      <div v-if="totalPages > 1" class="p-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <span>Page {{ page }} of {{ totalPages }} ({{ total }} transactions)</span>
+        <div class="flex items-center gap-2">
           <button
             @click="changePage(page - 1)"
             :disabled="page <= 1"
-            class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40"
+            class="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
           >
             Previous
           </button>
           <button
             @click="changePage(page + 1)"
             :disabled="page >= totalPages"
-            class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 disabled:opacity-40"
+            class="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
           >
             Next
           </button>

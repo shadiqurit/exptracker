@@ -137,7 +137,7 @@ function confirmReversal(t: Transfer) {
         <p>Click "Transfer Funds" above to move money between your accounts.</p>
       </div>
 
-      <div v-else class="overflow-x-auto">
+      <div v-else class="overflow-x-auto touch-scroll">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider text-[11px]">
             <tr>
@@ -198,9 +198,9 @@ function confirmReversal(t: Transfer) {
     </div>
 
     <!-- Transfer Dialog -->
-    <Dialog v-model:visible="showDialog" modal header="Internal Fund Transfer" :style="{ width: '32rem' }">
+    <Dialog v-model:visible="showDialog" modal header="Internal Fund Transfer" :style="{ width: '92vw', maxWidth: '32rem' }">
       <form @submit.prevent="handleExecuteTransfer" class="space-y-4 pt-2">
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Source Account (Outflow)</label>
             <select
@@ -227,7 +227,7 @@ function confirmReversal(t: Transfer) {
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Transfer Amount (BDT)</label>
             <input
@@ -268,17 +268,17 @@ function confirmReversal(t: Transfer) {
           />
         </div>
 
-        <div class="flex justify-end gap-2 pt-4">
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4">
           <button
             type="button"
             @click="showDialog = false"
-            class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+            class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 text-center"
           >
             Cancel
           </button>
           <button
             type="submit"
-            class="px-5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+            class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
           >
             Execute Transfer
           </button>

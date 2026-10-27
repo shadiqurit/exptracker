@@ -158,19 +158,19 @@ function handlePrint() {
 
     <!-- Report Navigation Tabs & Selectors -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-2 print:hidden">
-      <div class="flex flex-wrap items-center gap-1">
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 -mx-2 px-2 sm:mx-0 sm:px-0">
         <button
           v-for="tab in [
-            { id: 'monthly', label: 'Monthly Financial Report', icon: 'pi pi-calendar' },
-            { id: 'daily', label: 'Daily Transaction Report', icon: 'pi pi-clock' },
-            { id: 'yearly', label: 'Yearly Financial Report', icon: 'pi pi-chart-line' },
+            { id: 'monthly', label: 'Monthly Report', icon: 'pi pi-calendar' },
+            { id: 'daily', label: 'Daily Report', icon: 'pi pi-clock' },
+            { id: 'yearly', label: 'Yearly Report', icon: 'pi pi-chart-line' },
             { id: 'account', label: 'Account Statement', icon: 'pi pi-wallet' },
-            { id: 'category', label: 'Category Expense Summary', icon: 'pi pi-tags' }
+            { id: 'category', label: 'Category Summary', icon: 'pi pi-tags' }
           ]"
           :key="tab.id"
           @click="activeTab = (tab.id as any)"
           :class="[
-            'px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5',
+            'px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap',
             activeTab === tab.id
               ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm'
               : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -182,7 +182,7 @@ function handlePrint() {
       </div>
 
       <!-- Context Filters depending on Tab -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 self-start md:self-auto overflow-x-auto max-w-full pb-1">
         <template v-if="activeTab === 'daily'">
           <input
             v-model="selectedDate"
@@ -257,7 +257,7 @@ function handlePrint() {
         <div class="p-5 border-b border-slate-100 dark:border-slate-700">
           <h3 class="text-sm font-bold text-slate-900 dark:text-white">Account-Wise Reconciliation ({{ monthlyData.monthName }})</h3>
         </div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto touch-scroll">
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-500 font-bold uppercase text-[10px]">
               <tr>
