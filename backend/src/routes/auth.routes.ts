@@ -14,6 +14,7 @@ import {
 
 export const authRouter = Router();
 
+authRouter.get('/config', AuthController.getConfig);
 authRouter.post('/register', validate(registerSchema), AuthController.register);
 authRouter.post('/login', validate(loginSchema), AuthController.login);
 authRouter.post('/google', validate(googleAuthSchema), AuthController.googleAuth);

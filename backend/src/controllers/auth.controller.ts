@@ -20,6 +20,19 @@ export class AuthController {
     });
   }
 
+  static async getConfig(_req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    try {
+      res.json({
+        success: true,
+        data: {
+          googleClientId: config.google.clientId || '548972657787-pj0drteg4g3q714qncja69n1coqvdln5.apps.googleusercontent.com',
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async register(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const result = await AuthService.register(req.body);

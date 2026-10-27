@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useToast } from 'primevue/usetoast';
 import Dialog from 'primevue/dialog';
+import { Capacitor } from '@capacitor/core';
+import { SocialLogin } from '@capgo/capacitor-social-login';
 
 const props = withDefaults(
   defineProps<{
@@ -18,15 +20,21 @@ const router = useRouter();
 const authStore = useAuthStore();
 const toast = useToast();
 
+const DEFAULT_CLIENT_ID = '548972657787-pj0drteg4g3q714qncja69n1coqvdln5.apps.googleusercontent.com';
+
 const isLoading = ref(false);
 const showConfigModal = ref(false);
-const clientIdInput = ref(localStorage.getItem('google_client_id') || import.meta.env.VITE_GOOGLE_CLIENT_ID || '');
+const clientIdInput = ref(
+  localStorage.getItem('google_client_id') ||
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+  DEFAULT_CLIENT_ID
+);
 
 function getGoogleClientId(): string {
   return (
-    localStorage.getItem('google_client_id') ||
     import.meta.env.VITE_GOOGLE_CLIENT_ID ||
-    ''
+    localStorage.getItem('google_client_id') ||
+    DEFAULT_CLIENT_ID
   ).trim();
 }
 
@@ -53,19 +61,83 @@ function loadGoogleScript(): Promise<void> {
 }
 
 onMounted(() => {
-  loadGoogleScript().catch(() => {
-    // Non-blocking in offline / restricted networks
-  });
+  if (!Capacitor.isNativePlatform()) {
+    loadGoogleScript().catch(() => {
+      // Non-blocking in offline / restricted networks
+    });
+  }
 });
 
-async function handleGoogleClick() {
-  const clientId = getGoogleClientId();
-  if (!clientId) {
-    showConfigModal.value = true;
-    return;
-  }
+async function handleNativeGoogleLogin(clientId: string) {
+  try {
+    await SocialLogin.initialize({
+      google: {
+        webClientId: clientId,
+        mode: 'online',
+      },
+    });
 
-  isLoading.value = true;
+    const res = await SocialLogin.login({
+      provider: 'google',
+      options: {
+        scopes: ['email', 'profile'],
+      },
+    });
+
+    const result = res.result as any;
+    if (!result) {
+      throw new Error('Google Sign-In returned no credentials.');
+    }
+
+    const idToken = result.idToken || undefined;
+    const accessToken = typeof result.accessToken === 'string'
+      ? result.accessToken
+      : (result.accessToken?.token || undefined);
+
+    const email = result.profile?.email || undefined;
+    const firstName = result.profile?.givenName || undefined;
+    const lastName = result.profile?.familyName || undefined;
+    const avatarUrl = result.profile?.imageUrl || undefined;
+    const googleId = result.profile?.id || undefined;
+
+    await authStore.googleLogin({
+      idToken,
+      accessToken,
+      email,
+      firstName,
+      lastName,
+      avatarUrl,
+      googleId,
+    });
+
+    toast.add({
+      severity: 'success',
+      summary: props.mode === 'signup' ? 'Account Created' : 'Welcome Back!',
+      detail: 'Signed in with Google successfully',
+      life: 3000,
+    });
+
+    router.push('/dashboard');
+  } catch (err: any) {
+    console.error('[NativeGoogleAuth] Error:', err);
+    let msg = err.message || 'Google Sign-In failed';
+    if (err.message && (err.message.includes('10:') || err.message.includes('28444') || err.message.toLowerCase().includes('developer console'))) {
+      msg = 'Google Cloud Console Android Client ID missing or SHA-1 mismatch. Please verify your Android Client ID with SHA-1 fingerprint.';
+    } else if (err.message && (err.message.includes('16:') || err.message.toLowerCase().includes('cancel'))) {
+      msg = 'Google Sign-In was cancelled.';
+    }
+    toast.add({
+      severity: 'error',
+      summary: 'Google Sign-In Failed',
+      detail: msg,
+      life: 7000,
+    });
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+async function handleWebGoogleLogin(clientId: string) {
   try {
     await loadGoogleScript();
     const google = (window as any).google;
@@ -162,6 +234,21 @@ async function handleGoogleClick() {
       detail: err.message || 'Could not initialize Google authentication',
       life: 5000,
     });
+  }
+}
+
+async function handleGoogleClick() {
+  const clientId = getGoogleClientId();
+  if (!clientId) {
+    showConfigModal.value = true;
+    return;
+  }
+
+  isLoading.value = true;
+  if (Capacitor.isNativePlatform()) {
+    await handleNativeGoogleLogin(clientId);
+  } else {
+    await handleWebGoogleLogin(clientId);
   }
 }
 

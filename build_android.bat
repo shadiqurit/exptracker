@@ -18,6 +18,7 @@ if exist "C:\Program Files\Android\Android Studio\jbr\bin\java.exe" (
 echo [*] Step 1/3: Building Vue 3 Frontend (Server: https://exp.shadiqur.bd/api/v1)...
 cd /d "%~dp0frontend"
 set "VITE_API_URL=https://exp.shadiqur.bd/api/v1"
+set "VITE_GOOGLE_CLIENT_ID=548972657787-pj0drteg4g3q714qncja69n1coqvdln5.apps.googleusercontent.com"
 call npm run build
 if %errorlevel% neq 0 (
     echo [!] Frontend build failed!
