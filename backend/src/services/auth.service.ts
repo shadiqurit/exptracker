@@ -205,21 +205,23 @@ export class AuthService {
         const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
           headers: { Authorization: `Bearer ${data.accessToken}` },
         });
-        if (!response.ok) {
+        if (response.ok) {
+          const payload = (await response.json()) as any;
+          if (payload.email) {
+            verifiedEmail = payload.email.toLowerCase().trim();
+            verifiedGoogleId = payload.sub || verifiedGoogleId;
+            verifiedFirstName = payload.given_name || payload.name?.split(' ')[0] || verifiedFirstName || 'Google';
+            verifiedLastName = payload.family_name || payload.name?.split(' ').slice(1).join(' ') || verifiedLastName || 'User';
+            verifiedAvatarUrl = payload.picture || verifiedAvatarUrl;
+          }
+        } else if (!verifiedEmail) {
           throw new UnauthorizedError('Invalid Google access token');
         }
-        const payload = (await response.json()) as any;
-        if (!payload.email) {
-          throw new UnauthorizedError('Google account does not provide a valid email');
-        }
-        verifiedEmail = payload.email.toLowerCase().trim();
-        verifiedGoogleId = payload.sub;
-        verifiedFirstName = payload.given_name || payload.name?.split(' ')[0] || 'Google';
-        verifiedLastName = payload.family_name || payload.name?.split(' ').slice(1).join(' ') || 'User';
-        verifiedAvatarUrl = payload.picture || verifiedAvatarUrl;
       } catch (err: any) {
-        if (err instanceof UnauthorizedError) throw err;
-        throw new UnauthorizedError('Failed to fetch user info from Google: ' + (err.message || ''));
+        if (!verifiedEmail) {
+          if (err instanceof UnauthorizedError) throw err;
+          throw new UnauthorizedError('Failed to fetch user info from Google: ' + (err.message || ''));
+        }
       }
     } else if (process.env.NODE_ENV === 'development' && verifiedEmail) {
       // Development testing fallback

@@ -90,8 +90,27 @@ async function handleGoogleClick() {
         }
 
         try {
+          // 1. Fetch user profile directly from Google userinfo API
+          let profileInfo: any = {};
+          try {
+            const userinfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+            });
+            if (userinfoRes.ok) {
+              profileInfo = await userinfoRes.json();
+            }
+          } catch (e) {
+            console.warn('[GoogleAuth] Direct userinfo fetch skipped:', e);
+          }
+
+          // 2. Authenticate with backend
           await authStore.googleLogin({
             accessToken: tokenResponse.access_token,
+            email: profileInfo.email,
+            firstName: profileInfo.given_name,
+            lastName: profileInfo.family_name,
+            avatarUrl: profileInfo.picture,
+            googleId: profileInfo.sub,
           });
 
           toast.add({
@@ -103,11 +122,21 @@ async function handleGoogleClick() {
 
           router.push('/dashboard');
         } catch (authErr: any) {
+          console.error('[GoogleAuth] Backend error:', authErr);
+          let errorMsg = 'Could not complete Google authentication with backend.';
+          if (authErr.response?.status === 502 || authErr.response?.status === 503 || authErr.response?.status === 504) {
+            errorMsg = `Backend server is unavailable (${authErr.response.status} Bad Gateway). Please ensure the API is running on port 3006 on your server.`;
+          } else if (authErr.code === 'ERR_NETWORK' || !authErr.response) {
+            errorMsg = 'Cannot connect to backend server. Make sure API is running and reachable.';
+          } else if (authErr.response?.data?.message) {
+            errorMsg = authErr.response.data.message;
+          }
+
           toast.add({
             severity: 'error',
             summary: 'Authentication Failed',
-            detail: authErr.response?.data?.message || 'Could not complete Google authentication with backend.',
-            life: 5000,
+            detail: errorMsg,
+            life: 6000,
           });
         } finally {
           isLoading.value = false;
