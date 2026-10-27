@@ -26,12 +26,12 @@ export const loginSchema = z.object({
 
 export const googleAuthSchema = z.object({
   body: z.object({
-    idToken: z.string().optional(),
-    accessToken: z.string().optional(),
-    email: z.string().email().optional(),
+    idToken: z.string().optional().or(z.literal('')),
+    accessToken: z.string().optional().or(z.literal('')),
+    email: z.string().email().optional().or(z.literal('')),
     firstName: z.string().optional(),
     lastName: z.string().optional(),
-    avatarUrl: z.string().optional(),
+    avatarUrl: z.string().optional().or(z.literal('')),
     googleId: z.string().optional(),
   }),
 });

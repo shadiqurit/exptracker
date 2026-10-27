@@ -19,6 +19,7 @@ echo [*] Step 1/3: Building Vue 3 Frontend (Server: https://exp.shadiqur.bd/api/
 cd /d "%~dp0frontend"
 set "VITE_API_URL=https://exp.shadiqur.bd/api/v1"
 set "VITE_GOOGLE_CLIENT_ID=548972657787-pj0drteg4g3q714qncja69n1coqvdln5.apps.googleusercontent.com"
+set "VITE_GOOGLE_ANDROID_CLIENT_ID=548972657787-25abhshlh7p0ic78pcpadrp2p9ntl6ca.apps.googleusercontent.com"
 call npm run build
 if %errorlevel% neq 0 (
     echo [!] Frontend build failed!
