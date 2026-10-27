@@ -335,5 +335,39 @@ async function handleChangePassword() {
         </div>
       </div>
     </div>
+
+    <!-- Legal & Privacy Policy Card (Google Play Compliance) -->
+    <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700/60 shadow-sm space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-lg">
+          <i class="pi pi-shield"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">Privacy & Legal Compliance</h2>
+          <p class="text-xs text-slate-400">Review terms, privacy practices, and manage personal data rights</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3 pt-2">
+        <a
+          href="/privacy.html"
+          target="_blank"
+          rel="noopener"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-700/80 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
+        >
+          <i class="pi pi-external-link text-xs"></i>
+          <span>Privacy Policy</span>
+        </a>
+        <a
+          href="/delete-account.html"
+          target="_blank"
+          rel="noopener"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-950/60 text-rose-600 dark:text-rose-400 transition-colors"
+        >
+          <i class="pi pi-trash text-xs"></i>
+          <span>Account & Data Deletion</span>
+        </a>
+      </div>
+    </div>
   </div>
 </template>
